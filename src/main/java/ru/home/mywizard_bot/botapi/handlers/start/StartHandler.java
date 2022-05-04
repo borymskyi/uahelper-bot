@@ -3,11 +3,13 @@ package ru.home.mywizard_bot.botapi.handlers.start;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.home.mywizard_bot.botapi.BotState;
 import ru.home.mywizard_bot.botapi.InputMessageHandler;
+import ru.home.mywizard_bot.cache.UserDataCache;
 import ru.home.mywizard_bot.service.ReplyMessagesService;
 import ru.home.mywizard_bot.utils.Emojis;
 
@@ -32,6 +34,11 @@ public class StartHandler implements InputMessageHandler {
     @Override
     public SendMessage handle(Message message) {
         return processUsersInput(message);
+    }
+
+    @Override
+    public SendMessage handle(CallbackQuery callbackQuery, UserDataCache userDataCache) {
+        return null;
     }
 
     private SendMessage processUsersInput(Message inputMsg) {

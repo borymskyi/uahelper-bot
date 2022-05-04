@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import ru.home.mywizard_bot.cache.UserDataCache;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,9 +21,16 @@ public class BotStateContext {
         messageHandlers.forEach(handler -> this.messageHandlers.put(handler.getHandlerName(), handler));
     }
 
+    //Message
     public SendMessage processInputMessage(BotState currentState, Message message) {
         InputMessageHandler currentMessageHandler = findMessageHandler(currentState);
         return currentMessageHandler.handle(message);
+    }
+
+    //CallbackQuery
+    public SendMessage processInputCallbackQuery(BotState currentState, CallbackQuery callbackQuery, UserDataCache userDataCache) {
+        InputMessageHandler currentMessageHandler = findMessageHandler(currentState);
+        return currentMessageHandler.handle(callbackQuery, userDataCache);
     }
 
     private InputMessageHandler findMessageHandler(BotState currentState) {

@@ -3,6 +3,7 @@ package ru.home.mywizard_bot.botapi.handlers.evacuation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -34,6 +35,11 @@ public class EvacuationHandler implements InputMessageHandler {
             userDataCache.setUsersCurrentBotState(message.getFrom().getId().intValue(), BotState.SHOW_EVACUATION_POST);
         }
         return processUsersInput(message);
+    }
+
+    @Override
+    public SendMessage handle(CallbackQuery callbackQuery, UserDataCache userDataCache) {
+        return null;
     }
 
     @Override

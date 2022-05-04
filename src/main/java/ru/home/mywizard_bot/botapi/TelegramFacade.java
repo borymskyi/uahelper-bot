@@ -36,40 +36,42 @@ public class TelegramFacade {
         CallbackQuery callbackQuery = null;
         SendMessage replyMessage = null;
 
-        //Save UserData
-        UserProfileData user = new UserProfileData();
-        user.setProfileChatId(update.getMessage().getChatId().toString());
-        user.setProfileUserId(update.getMessage().getFrom().getId().intValue());
-        userDataCache.saveUserProfileData(update.getMessage().getFrom().getId().intValue(), user);
-
         if (update.hasCallbackQuery()) {
             callbackQuery = update.getCallbackQuery();
             log.info("New callbackQuery from User: {}, userId: {}, with data: {}",
                     update.getCallbackQuery().getFrom().getUserName(),
                     callbackQuery.getFrom().getId(),
                     update.getCallbackQuery().getData());
-            replyMessage = handleInputMessage(userDataCache, message, callbackQuery);
+            replyMessage = handleInputCallbackQuery(userDataCache, callbackQuery);
         }
 
         if (update.getMessage() != null && update.getMessage().hasText()) {
+            //Save UserData
+            UserProfileData user = new UserProfileData();
+            user.setProfileChatId(update.getMessage().getChatId().toString());
+            userDataCache.saveUserProfileData(update.getMessage().getFrom().getId().intValue(), user);
+
             message = update.getMessage();
             log.info("New message from User:{}, userId: {}, chatId: {},  with text: {}",
                     message.getFrom().getUserName(),
                     message.getFrom().getId(),
                     message.getChatId(),
                     message.getText());
-            replyMessage = handleInputMessage(userDataCache, message, callbackQuery);
+            replyMessage = handleInputMessage(userDataCache, message);
         }
 
         return replyMessage;
     }
 
-    private SendMessage handleInputMessage(UserDataCache userDataCache, Message message, CallbackQuery callbackQuery) {
-        String inputMsg = message.getText();
-        UserDataCache
-        BotState botState;
+    //Processing an incoming Message
+    private SendMessage handleInputMessage(UserDataCache userDataCache, Message message) {
         SendMessage replyMessage;
 
+        String inputMsg = message.getText();
+        int userId = message.getFrom().getId().intValue();
+        BotState botState;
+
+        //Проверка message / команды
         switch (inputMsg) {
             case "/start":
                 botState = BotState.SHOW_START;
@@ -79,43 +81,48 @@ public class TelegramFacade {
                 break;
         }
 
-        // установили / сохранили состояние(botstate) конкретного(user_id) юзера.
+        //save BotState
         userDataCache.setUsersCurrentBotState(userId, botState);
 
-        // обробатываю входящее сообщение /
+        //обробатываю входящий Message.
         replyMessage = botStateContext.processInputMessage(botState, message);
 
         return replyMessage;
     }
 
-    private BotApiMethod<?> processCallbackQuery(CallbackQuery buttonQuery) {
-        String inputButtonData = buttonQuery.getData();
-        int userId = buttonQuery.getFrom().getId().intValue();
+    //Processing an incoming CallbackQuery
+    private SendMessage handleInputCallbackQuery(UserDataCache userDataCache, CallbackQuery callbackQuery) {
+        SendMessage callBackAnswer;
+
+        String inputCallbackQuery = callbackQuery.getData();
+        int userId = callbackQuery.getFrom().getId().intValue();
         BotState botState;
-        BotApiMethod<?> callBackAnswer;
 
-        if (inputButtonData.equals("DataButtonTrO")) {
-            botState = BotState.SHOW_TRO;
-        }
-        else {
-            botState = userDataCache.getUsersCurrentBotState(userId);
-            /*callBackAnswer = sendAnswerCallbackQuery("Данная кнопка не поддерживается", true, buttonQuery);*/
+        //StartHandler
+        switch (inputCallbackQuery) {
+            case "DataButtonTrO":
+                botState = BotState.SHOW_TRO;
+                break;
+            case "DataButtonDeath":
+                botState = BotState.SHOW_DEATH;
+                break;
+            case "DataButtonEvacuation":
+                botState = BotState.SHOW_EVACUATION;
+                break;
+            case "DataButtonHumanitarian":
+                botState = BotState.SHOW_HUMANITARIAN;
+                break;
+            default:
+                botState = userDataCache.getUsersCurrentBotState(userId);
+                break;
         }
 
-        // установили / сохранили состояние(botstate) конкретного(user_id) юзера.
+        //save BotState
         userDataCache.setUsersCurrentBotState(userId, botState);
-        userDataCache.saveUserProfileData(userId, );
 
-        callBackAnswer = botStateContext.processInputMessage(botState);
+        //обробатываю входящий CallbackQuery.
+        callBackAnswer = botStateContext.processInputCallbackQuery(botState, callbackQuery, userDataCache);
 
         return callBackAnswer;
     }
-
-    /*private AnswerCallbackQuery sendAnswerCallbackQuery(String text, boolean alert, CallbackQuery callbackquery) {
-        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
-        answerCallbackQuery.setCallbackQueryId(callbackquery.getId());
-        answerCallbackQuery.setShowAlert(alert);
-        answerCallbackQuery.setText(text);
-        return answerCallbackQuery;
-    }*/
 }

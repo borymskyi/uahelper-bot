@@ -3,11 +3,13 @@ package ru.home.mywizard_bot.botapi.handlers.tro;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.home.mywizard_bot.botapi.BotState;
 import ru.home.mywizard_bot.botapi.InputMessageHandler;
+import ru.home.mywizard_bot.cache.UserDataCache;
 import ru.home.mywizard_bot.service.ReplyMessagesService;
 import ru.home.mywizard_bot.utils.Emojis;
 
@@ -31,11 +33,15 @@ public class TroHandler implements InputMessageHandler {
 
     @Override
     public SendMessage handle(Message message) {
-        return processUsersInput(message);
+        return null;
     }
 
-    private SendMessage processUsersInput(Message message) {
-        String chatId = message.getChatId().toString();
+    public SendMessage handle(CallbackQuery callbackQuery, UserDataCache userDataCache) {
+        return processUsersInput(callbackQuery, userDataCache);
+    }
+
+    private SendMessage processUsersInput(CallbackQuery callbackQuery, UserDataCache userDataCache) {
+        String chatId = userDataCache.getUserProfileData(callbackQuery.getFrom().getId().intValue()).getProfileChatId();
 
         SendMessage replyToUser = messagesService.getReplyMessage(chatId, "reply.goodLink");
         replyToUser.setReplyMarkup(getInlineMsgButtons());

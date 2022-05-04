@@ -13,13 +13,11 @@ import lombok.experimental.FieldDefaults;
 public class UserProfileData {
 
     String ProfileChatId;
-    int ProfileUserId;
 
     @Override
     public String toString() {
         return "UserProfileData{" +
                 "ProfileChatId='" + ProfileChatId + '\'' +
-                ", ProfileUserId=" + ProfileUserId +
                 '}';
     }
 }
