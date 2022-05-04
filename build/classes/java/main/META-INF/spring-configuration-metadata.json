@@ -1,0 +1,27 @@
+{
+  "groups": [
+    {
+      "name": "telegrambot",
+      "type": "ru.home.mywizard_bot.appconfig.BotConfig",
+      "sourceType": "ru.home.mywizard_bot.appconfig.BotConfig"
+    }
+  ],
+  "properties": [
+    {
+      "name": "telegrambot.bot-token",
+      "type": "java.lang.String",
+      "sourceType": "ru.home.mywizard_bot.appconfig.BotConfig"
+    },
+    {
+      "name": "telegrambot.bot-user-name",
+      "type": "java.lang.String",
+      "sourceType": "ru.home.mywizard_bot.appconfig.BotConfig"
+    },
+    {
+      "name": "telegrambot.web-hook-path",
+      "type": "java.lang.String",
+      "sourceType": "ru.home.mywizard_bot.appconfig.BotConfig"
+    }
+  ],
+  "hints": []
+}
