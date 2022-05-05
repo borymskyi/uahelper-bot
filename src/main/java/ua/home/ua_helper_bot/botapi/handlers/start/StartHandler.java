@@ -49,7 +49,7 @@ public class StartHandler implements InputMessageHandler {
 
         String startMessage = messagesService.getReplyText("reply.start", Emojis.SHAKING_HANDS);
         String startCategory = messagesService.getReplyText("reply.category");
-        SendMessage replyToUser = new SendMessage(chatId, String.format("%s%n%n%s", startMessage, startCategory));
+        SendMessage replyToUser = new SendMessage(chatId, messagesService.getReplyText("reply.startBack", Emojis.SHAKING_HANDS));
         replyToUser.setReplyMarkup(getInlineMsgButtons());
 
         return replyToUser;

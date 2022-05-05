@@ -123,6 +123,39 @@ public class TelegramFacade {
             case "DatabuttonReturn_TRO":
                 botState = BotState.SHOW_START_RETURN;
                 break;
+            //DeathHandler
+            case "DataButtonReturnDeath":
+                botState = BotState.SHOW_START_RETURN;
+                break;
+            //EvacuationHandler
+            case "DataButtonLeaveTheCity":
+                botState = BotState.SHOW_EVACUATION_CITY;
+                break;
+            case "DataButtonWhereToStay":
+                botState = BotState.SHOW_EVACUATION_ROAD;
+                break;
+            case "DataButtonReturnEvacuationFirst":
+                botState = BotState.SHOW_START_RETURN;
+                break;
+            case "DataButtonReturnEvacuationSecond":
+                botState = BotState.SHOW_EVACUATION;
+                break;
+            case "DataButtonAtTheStartEvacuationSecond":
+                botState = BotState.SHOW_START_RETURN;
+                break;
+            case "DataButtonReturnEvacuationThird":
+                botState = BotState.SHOW_EVACUATION;
+                break;
+            case "DataButtonAtTheStartEvacuationThird":
+                botState = BotState.SHOW_START_RETURN;
+                break;
+            //HumanitarianHandler
+            case "DataButtonReturnHumanitarian":
+                botState = BotState.SHOW_START_RETURN;
+                break;
+            case "DataButtonAtTheStartHumanitarian":
+                botState = BotState.SHOW_START_RETURN;
+                break;
             default:
                 botState = userDataCache.getUsersCurrentBotState(userId);
                 break;

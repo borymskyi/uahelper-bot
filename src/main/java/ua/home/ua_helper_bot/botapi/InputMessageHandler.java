@@ -9,9 +9,10 @@ import ua.home.ua_helper_bot.cache.UserDataCache;
 /**Обработчик сообщений
  */
 public interface InputMessageHandler {
+
+    BotState getHandlerName();
+
     BotApiMethod<?> handle(Message message);
 
     BotApiMethod<?> handle(CallbackQuery callbackQuery, UserDataCache userDataCache);
-
-    BotState getHandlerName();
 }

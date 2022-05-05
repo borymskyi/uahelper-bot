@@ -57,7 +57,6 @@ public class BotStateContext {
     private boolean isEvacuationProfileState(BotState currentState) {
         switch (currentState) {
             case SHOW_EVACUATION:
-            case SHOW_EVACUATION_POST:
             case SHOW_EVACUATION_CITY:
             case SHOW_EVACUATION_ROAD:
                 return true;

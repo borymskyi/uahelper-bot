@@ -12,7 +12,9 @@ public enum Emojis {
     HUMANITARIAN(EmojiParser.parseToUnicode("💊")),
     PSYCHOLOGICAL(EmojiParser.parseToUnicode("\uD83C\uDFDD")),
     RETURN(EmojiParser.parseToUnicode("⬅️")),
-    BEGINNING(EmojiParser.parseToUnicode("⏮"));
+    START(EmojiParser.parseToUnicode("⏮")),
+    BUS(EmojiParser.parseToUnicode("\uD83D\uDE8C")),
+    HOUSE(EmojiParser.parseToUnicode("\uD83C\uDFD8"));
 
     private String emojiName;
 
