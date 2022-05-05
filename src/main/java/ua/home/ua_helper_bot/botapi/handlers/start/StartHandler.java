@@ -2,7 +2,9 @@ package ua.home.ua_helper_bot.botapi.handlers.start;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -32,16 +34,17 @@ public class StartHandler implements InputMessageHandler {
     }
 
     @Override
-    public SendMessage handle(Message message) {
+    public BotApiMethod<?> handle(Message message) {
         return processUsersInput(message);
     }
 
     @Override
-    public SendMessage handle(CallbackQuery callbackQuery, UserDataCache userDataCache) {
+    public BotApiMethod<?> handle(CallbackQuery callbackQuery, UserDataCache userDataCache) {
         return processUsersInput(callbackQuery, userDataCache);
     }
 
-    private SendMessage processUsersInput(Message inputMsg) {
+    //process message (command)
+    private BotApiMethod<?> processUsersInput(Message inputMsg) {
         String chatId = inputMsg.getChatId().toString();
 
         String startMessage = messagesService.getReplyText("reply.start", Emojis.SHAKING_HANDS);
@@ -52,17 +55,21 @@ public class StartHandler implements InputMessageHandler {
         return replyToUser;
     }
 
-    private SendMessage processUsersInput(CallbackQuery callbackQuery, UserDataCache userDataCache) {
-        String chatId = userDataCache.getUserProfileData(callbackQuery.getFrom().getId().intValue()).getProfileChatId();
+    //process update (button)
+    private BotApiMethod<?> processUsersInput(CallbackQuery callbackQuery, UserDataCache userDataCache) {
+        EditMessageText editMessageText = new EditMessageText();
 
-        String startMessage = messagesService.getReplyText("reply.start", Emojis.SHAKING_HANDS);
-        String startCategory = messagesService.getReplyText("reply.category");
-        SendMessage replyToUser = new SendMessage(chatId, String.format("%s%n%n%s", startMessage, startCategory));
-        replyToUser.setReplyMarkup(getInlineMsgButtons());
+        editMessageText.setChatId((userDataCache.getUserProfileData(callbackQuery.getFrom().getId().intValue()).getProfileChatId()));
+        editMessageText.setMessageId(callbackQuery.getMessage().getMessageId());
+        editMessageText.setInlineMessageId(callbackQuery.getInlineMessageId());
 
-        return replyToUser;
+        editMessageText.setText(messagesService.getReplyText("reply.startBack", Emojis.SHAKING_HANDS));
+        editMessageText.setReplyMarkup(getInlineMsgButtons());
+
+        return editMessageText;
     }
 
+    //create buttons
     private InlineKeyboardMarkup getInlineMsgButtons() {
 
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();

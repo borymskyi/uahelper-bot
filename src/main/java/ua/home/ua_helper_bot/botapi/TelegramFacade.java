@@ -30,24 +30,29 @@ public class TelegramFacade {
         this.messagesService = messagesService;
     }
 
+    //Catch an update from the user
     public BotApiMethod<?> handleUpdate(Update update) {
-        update.hasCallbackQuery();
+        BotApiMethod<?> replyMessage = null;
         Message message = null;
         CallbackQuery callbackQuery = null;
-        SendMessage replyMessage = null;
+        UserProfileData user = new UserProfileData();
 
+        //Update Button
         if (update.hasCallbackQuery()) {
+
             callbackQuery = update.getCallbackQuery();
             log.info("New callbackQuery from User: {}, userId: {}, with data: {}",
-                    update.getCallbackQuery().getFrom().getUserName(),
+                    callbackQuery.getFrom().getUserName(),
                     callbackQuery.getFrom().getId(),
-                    update.getCallbackQuery().getData());
+                    callbackQuery.getData());
+
+            //process update
             replyMessage = handleInputCallbackQuery(userDataCache, callbackQuery);
         }
 
+        //Update message(/command)
         if (update.getMessage() != null && update.getMessage().hasText()) {
-            //Save UserData
-            UserProfileData user = new UserProfileData();
+            //Save UserData chatId
             user.setProfileChatId(update.getMessage().getChatId().toString());
             userDataCache.saveUserProfileData(update.getMessage().getFrom().getId().intValue(), user);
 
@@ -57,22 +62,24 @@ public class TelegramFacade {
                     message.getFrom().getId(),
                     message.getChatId(),
                     message.getText());
+
+            //Process update
             replyMessage = handleInputMessage(userDataCache, message);
         }
 
         return replyMessage;
     }
 
-    //Processing an incoming Message
-    private SendMessage handleInputMessage(UserDataCache userDataCache, Message message) {
-        SendMessage replyMessage;
+    //Processing update (message/command)
+    private BotApiMethod<?> handleInputMessage(UserDataCache userDataCache, Message message) {
+        BotApiMethod<?> replyMessage;
 
-        String inputMsg = message.getText();
+        String inputText = message.getText();
         int userId = message.getFrom().getId().intValue();
         BotState botState;
 
         //Проверка message / команды
-        switch (inputMsg) {
+        switch (inputText) {
             case "/start":
                 botState = BotState.SHOW_START;
                 break;
@@ -84,15 +91,15 @@ public class TelegramFacade {
         //save BotState
         userDataCache.setUsersCurrentBotState(userId, botState);
 
-        //обробатываю входящий Message.
+        //next processing update message(command)
         replyMessage = botStateContext.processInputMessage(botState, message);
 
         return replyMessage;
     }
 
-    //Processing an incoming CallbackQuery
-    private SendMessage handleInputCallbackQuery(UserDataCache userDataCache, CallbackQuery callbackQuery) {
-        SendMessage callBackAnswer;
+    //Processing update (button)
+    private BotApiMethod<?> handleInputCallbackQuery(UserDataCache userDataCache, CallbackQuery callbackQuery) {
+        BotApiMethod<?> callBackAnswer;
 
         String inputCallbackQuery = callbackQuery.getData();
         int userId = callbackQuery.getFrom().getId().intValue();
@@ -114,10 +121,7 @@ public class TelegramFacade {
                 break;
             //TroHandler
             case "DatabuttonReturn_TRO":
-                botState = BotState.SHOW_START;
-                break;
-            case "DatabuttonAtTheBeginning_TRO":
-                botState = BotState.SHOW_START;
+                botState = BotState.SHOW_START_RETURN;
                 break;
             default:
                 botState = userDataCache.getUsersCurrentBotState(userId);
@@ -127,7 +131,7 @@ public class TelegramFacade {
         //save BotState
         userDataCache.setUsersCurrentBotState(userId, botState);
 
-        //обробатываю входящий CallbackQuery.
+        //next processing update (button)
         callBackAnswer = botStateContext.processInputCallbackQuery(botState, callbackQuery, userDataCache);
 
         return callBackAnswer;

@@ -7,6 +7,7 @@ package ua.home.ua_helper_bot.botapi;
 public enum BotState {
 
     SHOW_START,
+    SHOW_START_RETURN,
     SHOW_TRO,
     SHOW_DEATH,
     SHOW_EVACUATION,
