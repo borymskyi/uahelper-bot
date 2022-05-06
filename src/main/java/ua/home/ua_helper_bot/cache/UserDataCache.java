@@ -45,4 +45,8 @@ public class UserDataCache implements DataCache {
     public void saveUserProfileData(int userId, UserProfileData userProfileData) {
         usersProfileData.put(userId, userProfileData);
     }
+
+    public Map<Integer, UserProfileData> getUsersProfileData() {
+        return usersProfileData;
+    }
 }

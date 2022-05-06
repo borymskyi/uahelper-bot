@@ -4,20 +4,26 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-/**
- * Данные анкеты пользователя
- */
+import java.time.LocalDateTime;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserProfileData {
 
-    String ProfileChatId;
+    String profileChatId;
+    int userId;
+    LocalDateTime updateUserTime;
+    Integer messageId;
+    String inlineMessageId;
 
     @Override
     public String toString() {
         return "UserProfileData{" +
-                "ProfileChatId='" + ProfileChatId + '\'' +
+                "profileChatId='" + profileChatId + '\'' +
+                ", userId=" + userId +
+                ", updateUserTime=" + updateUserTime +
+                ", messageId=" + messageId +
+                ", inlineMessageId='" + inlineMessageId + '\'' +
                 '}';
     }
 }

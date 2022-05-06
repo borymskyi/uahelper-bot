@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageRe
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.MessageAutoDeleteTimerChanged;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -54,7 +55,6 @@ public class TroHandler implements InputMessageHandler {
         editMessageText.setInlineMessageId(callbackQuery.getInlineMessageId());
         editMessageText.setText(messagesService.getReplyText("reply.goodLink"));
         editMessageText.setReplyMarkup(getInlineMsgButtons());
-
         return editMessageText;
     }
 

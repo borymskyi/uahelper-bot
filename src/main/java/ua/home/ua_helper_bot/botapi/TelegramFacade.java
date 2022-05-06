@@ -2,16 +2,23 @@ package ua.home.ua_helper_bot.botapi;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ua.home.ua_helper_bot.MyWizardTelegramBot;
 import ua.home.ua_helper_bot.model.UserProfileData;
 import ua.home.ua_helper_bot.cache.UserDataCache;
 import ua.home.ua_helper_bot.service.ReplyMessagesService;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -32,6 +39,8 @@ public class TelegramFacade {
 
     //Catch an update from the user
     public BotApiMethod<?> handleUpdate(Update update) {
+        update.getUpdateId();
+
         BotApiMethod<?> replyMessage = null;
         Message message = null;
         CallbackQuery callbackQuery = null;
@@ -39,6 +48,12 @@ public class TelegramFacade {
 
         //Update Button
         if (update.hasCallbackQuery()) {
+            //Save UserData
+            user.setProfileChatId(update.getCallbackQuery().getMessage().getChatId().toString());
+            user.setUserId(update.getCallbackQuery().getFrom().getId().intValue());
+            user.setMessageId(update.getCallbackQuery().getMessage().getMessageId());
+            user.setInlineMessageId(update.getCallbackQuery().getInlineMessageId());
+            userDataCache.saveUserProfileData(user.getUserId(), user);
 
             callbackQuery = update.getCallbackQuery();
             log.info("New callbackQuery from User: {}, userId: {}, with data: {}",
@@ -52,9 +67,10 @@ public class TelegramFacade {
 
         //Update message(/command)
         if (update.getMessage() != null && update.getMessage().hasText()) {
-            //Save UserData chatId
+            //Save UserData
             user.setProfileChatId(update.getMessage().getChatId().toString());
-            userDataCache.saveUserProfileData(update.getMessage().getFrom().getId().intValue(), user);
+            user.setUserId(update.getMessage().getFrom().getId().intValue());
+            userDataCache.saveUserProfileData(user.getUserId(), user);
 
             message = update.getMessage();
             log.info("New message from User:{}, userId: {}, chatId: {},  with text: {}",
@@ -66,6 +82,10 @@ public class TelegramFacade {
             //Process update
             replyMessage = handleInputMessage(userDataCache, message);
         }
+
+        //Save UserData
+        user.setUpdateUserTime(LocalDateTime.now());
+        userDataCache.saveUserProfileData(user.getUserId(), user);
 
         return replyMessage;
     }
@@ -168,5 +188,32 @@ public class TelegramFacade {
         callBackAnswer = botStateContext.processInputCallbackQuery(botState, callbackQuery, userDataCache);
 
         return callBackAnswer;
+    }
+
+    @Scheduled(fixedRateString = "${pingTaskMethod.period}")
+    public void deleteMessage() {
+        System.out.println("Активность юзеров:");
+
+        LocalDateTime timeNow = LocalDateTime.now();
+
+        Map<Integer, UserProfileData> usersProfileData = new HashMap<>(userDataCache.getUsersProfileData());
+        for(Map.Entry<Integer, UserProfileData> item : usersProfileData.entrySet()){
+            System.out.printf("Key: %s  Value: %s \n", item.getKey(), item.getValue());
+
+            LocalDateTime timeUser = item.getValue().getUpdateUserTime();
+            LocalDateTime timeEnd = timeUser.plusMinutes(4);
+
+            if (timeNow.isAfter(timeUser) && timeNow.isAfter(timeEnd)) {
+                myWizardBot.deleteLastMessage(item.getValue().getProfileChatId(), item.getValue().getMessageId());
+                myWizardBot.sendEndMessage(item.getValue().getProfileChatId());
+                userDataCache.getUsersProfileData().remove(item.getKey());
+                System.out.println("Поток закрыт");
+                System.out.println();
+            } else {
+                System.out.println("Поток активный");
+                System.out.println();
+            }
+
+        }
     }
 }
