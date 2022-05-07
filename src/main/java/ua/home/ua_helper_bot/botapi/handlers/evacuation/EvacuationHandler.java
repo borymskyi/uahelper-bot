@@ -3,7 +3,6 @@ package ua.home.ua_helper_bot.botapi.handlers.evacuation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -12,7 +11,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import ua.home.ua_helper_bot.botapi.BotState;
 import ua.home.ua_helper_bot.botapi.InputMessageHandler;
 import ua.home.ua_helper_bot.cache.UserDataCache;
-import ua.home.ua_helper_bot.model.UserProfileData;
 import ua.home.ua_helper_bot.service.ReplyMessagesService;
 import ua.home.ua_helper_bot.utils.Emojis;
 
@@ -25,8 +23,8 @@ public class EvacuationHandler implements InputMessageHandler {
 
     private ReplyMessagesService replyMessagesService;
 
-    public EvacuationHandler(ReplyMessagesService messagesService) {
-        this.replyMessagesService = messagesService;
+    public EvacuationHandler(ReplyMessagesService replyMessagesService) {
+        this.replyMessagesService = replyMessagesService;
     }
 
     @Override
@@ -35,7 +33,7 @@ public class EvacuationHandler implements InputMessageHandler {
     }
 
     @Override
-    public SendMessage handle(Message message) {
+    public BotApiMethod<?> handle(Message message) {
         return null;
     }
 
@@ -44,23 +42,23 @@ public class EvacuationHandler implements InputMessageHandler {
         return processUsersInput(callbackQuery, userDataCache);
     }
 
+    //process update (button)
     private BotApiMethod<?> processUsersInput(CallbackQuery callbackQuery, UserDataCache userDataCache) {
-
         EditMessageText editMessageText = new EditMessageText();
 
         editMessageText.setChatId((userDataCache.getUserProfileData(callbackQuery.getFrom().getId().intValue()).getProfileChatId()));
         editMessageText.setMessageId(callbackQuery.getMessage().getMessageId());
         editMessageText.setInlineMessageId(callbackQuery.getInlineMessageId());
 
-        if (userDataCache.getUsersCurrentBotState(callbackQuery.getFrom().getId().intValue()).equals(BotState.SHOW_EVACUATION)) {
+        if (userDataCache.getUsersBotState(callbackQuery.getFrom().getId().intValue()).equals(BotState.SHOW_EVACUATION)) {
             editMessageText.setText(replyMessagesService.getReplyText("reply.category"));
             editMessageText.setReplyMarkup(getEvacuationFirstInlineKeyboardButtons());
         }
-        else if ((userDataCache.getUsersCurrentBotState(callbackQuery.getFrom().getId().intValue()).equals(BotState.SHOW_EVACUATION_CITY))) {
+        else if ((userDataCache.getUsersBotState(callbackQuery.getFrom().getId().intValue()).equals(BotState.SHOW_EVACUATION_CITY))) {
             editMessageText.setText(replyMessagesService.getReplyText("reply.goodLinkForLeaveCity"));
             editMessageText.setReplyMarkup(getEvacuationSecondInlineKeyboardButtons());
         }
-        else if ((userDataCache.getUsersCurrentBotState(callbackQuery.getFrom().getId().intValue()).equals(BotState.SHOW_EVACUATION_ROAD))) {
+        else if ((userDataCache.getUsersBotState(callbackQuery.getFrom().getId().intValue()).equals(BotState.SHOW_EVACUATION_ROAD))) {
             editMessageText.setText(replyMessagesService.getReplyText("reply.goodLinkToFindHousing"));
             editMessageText.setReplyMarkup(getEvacuationThirdInlineKeyboardButtons());
         }

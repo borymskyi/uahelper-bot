@@ -47,8 +47,6 @@ public class StartHandler implements InputMessageHandler {
     private BotApiMethod<?> processUsersInput(Message inputMsg) {
         String chatId = inputMsg.getChatId().toString();
 
-        String startMessage = messagesService.getReplyText("reply.start", Emojis.SHAKING_HANDS);
-        String startCategory = messagesService.getReplyText("reply.category");
         SendMessage replyToUser = new SendMessage(chatId, messagesService.getReplyText("reply.startBack", Emojis.SHAKING_HANDS));
         replyToUser.setReplyMarkup(getInlineMsgButtons());
 

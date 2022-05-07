@@ -140,10 +140,6 @@ public class HumanitarianHandler implements InputMessageHandler {
         buttonRetry.setText(Emojis.RETURN + " Повернутись");
         buttonRetry.setCallbackData("DataButtonReturnHumanitarian");
 
-        InlineKeyboardButton buttonAtTheStart = new InlineKeyboardButton(); //+17
-        buttonAtTheStart.setText(Emojis.START + " На початок");
-        buttonAtTheStart.setCallbackData("DataButtonAtTheStartHumanitarian");
-
         List<InlineKeyboardButton> keyboardButtonRow1 = new ArrayList<>();
         keyboardButtonRow1.add(buttonInstructionForRefugrees);
 
@@ -191,7 +187,6 @@ public class HumanitarianHandler implements InputMessageHandler {
 
         List<InlineKeyboardButton> keyboardButtonRow16 = new ArrayList<>();
         keyboardButtonRow16.add(buttonRetry);
-        keyboardButtonRow16.add(buttonAtTheStart);
 
         List<List<InlineKeyboardButton>> rowsList = new ArrayList<>();
         rowsList.add(keyboardButtonRow1);

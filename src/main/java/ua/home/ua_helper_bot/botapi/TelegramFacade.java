@@ -39,8 +39,6 @@ public class TelegramFacade {
 
     //Catch an update from the user
     public BotApiMethod<?> handleUpdate(Update update) {
-        update.getUpdateId();
-
         BotApiMethod<?> replyMessage = null;
         Message message = null;
         CallbackQuery callbackQuery = null;
@@ -48,7 +46,7 @@ public class TelegramFacade {
 
         //Update Button
         if (update.hasCallbackQuery()) {
-            //Save UserData
+            //save UserData
             user.setProfileChatId(update.getCallbackQuery().getMessage().getChatId().toString());
             user.setUserId(update.getCallbackQuery().getFrom().getId().intValue());
             user.setMessageId(update.getCallbackQuery().getMessage().getMessageId());
@@ -65,11 +63,12 @@ public class TelegramFacade {
             replyMessage = handleInputCallbackQuery(userDataCache, callbackQuery);
         }
 
-        //Update message(/command)
+        //Update message/command
         if (update.getMessage() != null && update.getMessage().hasText()) {
-            //Save UserData
+            //save UserData
             user.setProfileChatId(update.getMessage().getChatId().toString());
             user.setUserId(update.getMessage().getFrom().getId().intValue());
+            user.setMessageId(update.getMessage().getMessageId());
             userDataCache.saveUserProfileData(user.getUserId(), user);
 
             message = update.getMessage();
@@ -79,11 +78,11 @@ public class TelegramFacade {
                     message.getChatId(),
                     message.getText());
 
-            //Process update
+            //process update
             replyMessage = handleInputMessage(userDataCache, message);
         }
 
-        //Save UserData
+        //save UserData
         user.setUpdateUserTime(LocalDateTime.now());
         userDataCache.saveUserProfileData(user.getUserId(), user);
 
@@ -192,7 +191,7 @@ public class TelegramFacade {
 
     @Scheduled(fixedRateString = "${pingTaskMethod.period}")
     public void deleteMessage() {
-        System.out.println("Активность юзеров:");
+        System.out.println("▄■▀■▄■▀■▄ User activity ▄■▀■▄■▀■▄");
 
         LocalDateTime timeNow = LocalDateTime.now();
 
@@ -207,10 +206,10 @@ public class TelegramFacade {
                 myWizardBot.deleteLastMessage(item.getValue().getProfileChatId(), item.getValue().getMessageId());
                 myWizardBot.sendEndMessage(item.getValue().getProfileChatId());
                 userDataCache.getUsersProfileData().remove(item.getKey());
-                System.out.println("Поток закрыт");
+                System.out.println("Stream closed");
                 System.out.println();
             } else {
-                System.out.println("Поток активный");
+                System.out.println("Stream active");
                 System.out.println();
             }
 

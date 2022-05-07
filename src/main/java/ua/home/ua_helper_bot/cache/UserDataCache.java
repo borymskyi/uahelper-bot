@@ -24,12 +24,12 @@ public class UserDataCache implements DataCache {
 
     @Override
     public BotState getUsersCurrentBotState(int userId) {
-        BotState botState = usersBotStates.get(userId);
-        if (botState == null) {
-            botState = BotState.SHOW_START;
-        }
-
+        BotState botState = BotState.SHOW_ERROR;
         return botState;
+    }
+
+    public BotState getUsersBotState(int userId) {
+        return usersBotStates.get(userId);
     }
 
     @Override
@@ -42,8 +42,20 @@ public class UserDataCache implements DataCache {
     }
 
     @Override
-    public void saveUserProfileData(int userId, UserProfileData userProfileData) {
-        usersProfileData.put(userId, userProfileData);
+    public void saveUserProfileData(int userId, UserProfileData inputUserProfileData) {
+
+        if (usersProfileData.get(userId) == null ) {
+            usersProfileData.put(userId, inputUserProfileData);
+        }
+        else {
+            UserProfileData userProfileDataNew = usersProfileData.get(userId);
+            userProfileDataNew.setProfileChatId(inputUserProfileData.getProfileChatId());
+            userProfileDataNew.setUserId(inputUserProfileData.getUserId());
+            userProfileDataNew.setUpdateUserTime(inputUserProfileData.getUpdateUserTime());
+            userProfileDataNew.setMessageId(inputUserProfileData.getMessageId());
+            userProfileDataNew.setAllMessageIdUser(inputUserProfileData.getMessageId());
+        }
+
     }
 
     public Map<Integer, UserProfileData> getUsersProfileData() {

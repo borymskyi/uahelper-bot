@@ -14,7 +14,8 @@ public enum Emojis {
     RETURN(EmojiParser.parseToUnicode("⬅️")),
     START(EmojiParser.parseToUnicode("⏮")),
     BUS(EmojiParser.parseToUnicode("\uD83D\uDE8C")),
-    HOUSE(EmojiParser.parseToUnicode("\uD83C\uDFD8"));
+    HOUSE(EmojiParser.parseToUnicode("\uD83C\uDFD8")),
+    ROBOT(EmojiParser.parseToUnicode("\uD83E\uDD16"));
 
     private String emojiName;
 
