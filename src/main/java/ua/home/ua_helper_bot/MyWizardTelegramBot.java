@@ -68,6 +68,7 @@ public class MyWizardTelegramBot extends TelegramWebhookBot {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+        System.out.println("Stream closed");
     }
 
     // Method that send last message

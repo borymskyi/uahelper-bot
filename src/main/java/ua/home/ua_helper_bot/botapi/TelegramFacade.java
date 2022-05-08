@@ -51,6 +51,7 @@ public class TelegramFacade {
             user.setUserId(update.getCallbackQuery().getFrom().getId().intValue());
             user.setMessageId(update.getCallbackQuery().getMessage().getMessageId());
             user.setInlineMessageId(update.getCallbackQuery().getInlineMessageId());
+            user.setUpdateUserTime(LocalDateTime.now());
             userDataCache.saveUserProfileData(user.getUserId(), user);
 
             callbackQuery = update.getCallbackQuery();
@@ -69,6 +70,7 @@ public class TelegramFacade {
             user.setProfileChatId(update.getMessage().getChatId().toString());
             user.setUserId(update.getMessage().getFrom().getId().intValue());
             user.setMessageId(update.getMessage().getMessageId());
+            user.setUpdateUserTime(LocalDateTime.now());
             userDataCache.saveUserProfileData(user.getUserId(), user);
 
             message = update.getMessage();
@@ -81,10 +83,6 @@ public class TelegramFacade {
             //process update
             replyMessage = handleInputMessage(userDataCache, message);
         }
-
-        //save UserData
-        user.setUpdateUserTime(LocalDateTime.now());
-        userDataCache.saveUserProfileData(user.getUserId(), user);
 
         return replyMessage;
     }
@@ -196,23 +194,25 @@ public class TelegramFacade {
         LocalDateTime timeNow = LocalDateTime.now();
 
         Map<Integer, UserProfileData> usersProfileData = new HashMap<>(userDataCache.getUsersProfileData());
-        for(Map.Entry<Integer, UserProfileData> item : usersProfileData.entrySet()){
+
+        for (Map.Entry<Integer, UserProfileData> item : usersProfileData.entrySet()) {
+
             System.out.printf("Key: %s  Value: %s \n", item.getKey(), item.getValue());
 
-            LocalDateTime timeUser = item.getValue().getUpdateUserTime();
-            LocalDateTime timeEnd = timeUser.plusMinutes(4);
+            if (item.getValue().getMessageId() != null) {
 
-            if (timeNow.isAfter(timeUser) && timeNow.isAfter(timeEnd)) {
-                myWizardBot.deleteLastMessage(item.getValue().getProfileChatId(), item.getValue().getMessageId());
-                myWizardBot.sendEndMessage(item.getValue().getProfileChatId());
-                userDataCache.getUsersProfileData().remove(item.getKey());
-                System.out.println("Stream closed");
-                System.out.println();
-            } else {
-                System.out.println("Stream active");
-                System.out.println();
+                LocalDateTime timeUser = item.getValue().getUpdateUserTime();
+                LocalDateTime timeEnd = timeUser.plusMinutes(4);
+
+                if (timeNow.isAfter(timeUser) && timeNow.isAfter(timeEnd)) {
+                    myWizardBot.deleteLastMessage(item.getValue().getProfileChatId(), item.getValue().getMessageId());
+                    myWizardBot.sendEndMessage(item.getValue().getProfileChatId());
+                    userDataCache.getUsersProfileData().remove(item.getKey());
+                } else {
+                    System.out.println("Stream active");
+                    System.out.println();
+                }
             }
-
         }
     }
 }
