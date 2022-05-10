@@ -1,4 +1,4 @@
-# Ua_Helper_Bot
+# Помічник українця
 **EN: [Telegram Bot](https://t.me/ua_borymskyi_helper_bot)** which helps Ukrainians during the war. Provides information on evacuation, humanitarian aid, how to join the TrO, provides psychological assistance, etc.
 
 Used in the development: *Java, Spring Boot, Gradle, Git, Deploy app to [Heroku](https://dashboard.heroku.com/).*
